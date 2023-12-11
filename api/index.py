@@ -87,5 +87,3 @@ def verificar_swift():
                 "error": "1012"
             }
         }), 500 
-
-if __name__ == '__main__':
