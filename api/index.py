@@ -3,6 +3,9 @@ import requests
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
+@app.route('/')
+def home():
+    return 'Hello, World!'
 
 @app.route('/verificar_swift', methods=['POST'])
 def verificar_swift():
