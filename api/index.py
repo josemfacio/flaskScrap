@@ -3,9 +3,6 @@ import requests
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
-@app.route('/')
-def home():
-    return 'Hello, World!'
 
 @app.route('/verificar_swift', methods=['POST'])
 def verificar_swift():
@@ -14,30 +11,41 @@ def verificar_swift():
         code = request.form.get('code', '')
 
         # URL de la página
-        url = 'https://wise.com/es/swift-codes/bic-swift-code-checker'
+        url = 'https://wise.com/es/swift-codes/bic-swift-code-checker?code='+code
 
-        # Datos para la solicitud POST
-        payload = {'code': code}
-
-        response = requests.post(url, data=payload)
+        response = requests.post(url)
         response.raise_for_status()
 
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Encontrar la etiqueta <p> con la clase específica
-        data_paragraph = soup.find('p', class_='visible-xs visible-sm')
-        # Verificar si se encontró la etiqueta
-        if data_paragraph:
-            # Extraer datos específicos dentro de la etiqueta <span>
-            spans = data_paragraph.find_all('span')
-            # Construir lista de datos recuperados
+        # Escribir el contenido de la respuesta en un archivo HTML
+        with open("swift_code_result.html", "w", encoding="utf-8") as file:
+            file.write(str(soup.prettify()))
+
+        # Buscar todos los elementos de definición (<dl>)
+        data_items = soup.find_all('dl', class_='_detailsList_5tbr3_1')
+        print(data_items)
+        if data_items:
+            bank_info = []  # Lista para almacenar la información
+
+            for dl in data_items:
+                terms = dl.find_all('dt')
+                definitions = dl.find_all('dd')
+                for term, definition in zip(terms, definitions):
+                    term_text = term.text.strip()
+                    definition_text = definition.text.strip()
+
+                    # Añadir término y definición a la lista
+                    bank_info.append({
+                        "term": term_text,
+                        "definition": definition_text
+                    })
+
+            # Respuesta en formato JSON
             response_json = {
                 "swiftCode": {
                     "swift": code,
-                    "country": spans[3].text,
-                    "countrycode": code[4:6],
-                    "bank": spans[0].text,
-                    "address": spans[1].text,
+                    "info": bank_info,  # Aquí se incluye la lista
                     "valid": True,
                     "message": None,
                     "error": None
@@ -45,13 +53,11 @@ def verificar_swift():
             }
             return jsonify(response_json)
 
+        # Respuesta si no se encuentra información
         return jsonify({
             "swiftCode": {
                 "swift": None,
-                "country": None,
-                "countrycode": None,
-                "bank": None,
-                "address": None,
+                "info": [],  # Lista vacía si no se encontró información
                 "valid": False,
                 "message": "No encontramos tu código, por favor a continuación escribe los datos del banco del beneficiario.",
                 "error": "1013"
@@ -59,14 +65,10 @@ def verificar_swift():
         }), 400
 
     except requests.exceptions.RequestException as e:
-        # Manejar error de solicitud
         return jsonify({
             "swiftCode": {
                 "swift": None,
-                "country": None,
-                "countrycode": None,
-                "bank": None,
-                "address": None,
+                "info": [],
                 "valid": False,
                 "message": f"Error al intentar buscar {e}",
                 "error": "1012"
@@ -74,16 +76,15 @@ def verificar_swift():
         }), 400     
 
     except Exception as e:
-        # Manejar otros errores
         return jsonify({
             "swiftCode": {
                 "swift": None,
-                "country": None,
-                "countrycode": None,
-                "bank": None,
-                "address": None,
+                "info": [],
                 "valid": False,
                 "message": f"Error desconocido {e}",
                 "error": "1012"
             }
         }), 500 
+
+if __name__ == '__main__':
+    app.run(debug=True)
