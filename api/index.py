@@ -71,7 +71,3 @@ def verificar_swift():
                 "error": "1012"
             }
         }), 500
-
-# Adapt Flask app to WSGI for Vercel
-from vercel_wsgi import make_wsgi_app
-app = make_wsgi_app(app)
