@@ -1,28 +1,53 @@
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fflask3&demo-title=Flask%203%20%2B%20Vercel&demo-description=Use%20Flask%203%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fflask3-python-template.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994156/random/flask.png)
+# Verificador de Código SWIFT
 
-# Flask + Vercel
+Esta aplicación es una API creada con Flask que permite verificar códigos SWIFT. Al enviar un código SWIFT, la API realiza una solicitud a un servicio externo y devuelve información relacionada con el banco asociado a dicho código, incluyendo dirección, nombre del banco, país y código de país.
 
-This example shows how to use Flask 3 on Vercel with Serverless Functions using the [Python Runtime](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/python).
+## Características
 
-## Demo
+- Verificación de códigos SWIFT a través de un servicio externo.
+- Devolución de detalles del banco, como dirección, nombre, país y código de país.
+- Respuesta JSON estructurada, incluso en caso de error.
 
-https://flask-python-template.vercel.app/
+## Estructura de la respuesta
 
-## How it Works
+La API siempre devuelve una respuesta en el siguiente formato:
 
-This example uses the Web Server Gateway Interface (WSGI) with Flask to enable handling requests on Vercel with Serverless Functions.
+```json
+{
+    "swiftCode": {
+        "address": "JUNIN Y PANAMA 200",
+        "bank": "BANCO BOLIVARIANO C.A.",
+        "country": "Ecuador",
+        "error": null,
+        "message": null,
+        "swift": "BBOLECEGXXX",
+        "valid": true
+    }
+}
 
-## Running Locally
-
-```bash
-npm i -g vercel
-vercel dev
 ```
 
-Your Flask application is now available at `http://localhost:3000`.
+## Ejecución Local
 
-## One-Click Deploy
+agrega esta linea al final
+```
+if __name__ == "__main__":
+    app.run(debug=True)
+```
+- cd app
+- python index.py
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
+- Abre tu navegador o utiliza herramientas como Postman para enviar solicitudes POST a:
+http://127.0.0.1:5000/verificar_swift
+- Envía el código SWIFT como parte del formulario en la solicitud POST:
+```
+{
+  "code": "ABCUS33XXX"
+}
+```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fflask3&demo-title=Flask%203%20%2B%20Vercel&demo-description=Use%20Flask%203%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fflask3-python-template.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994156/random/flask.png)
+## Requisitos
+
+- Python 3.7 o superior
+- Pip (el gestor de paquetes de Python)
+
