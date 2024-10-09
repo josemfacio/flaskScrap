@@ -18,9 +18,6 @@ def verificar_swift():
 
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        with open("swift_code_result.html", "w", encoding="utf-8") as file:
-            file.write(str(soup.prettify()))
-
         data_items = soup.find_all('dl', class_='_detailsList_5tbr3_1')
         if data_items:
             bank_info = []
